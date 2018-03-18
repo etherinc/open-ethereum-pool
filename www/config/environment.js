@@ -18,7 +18,7 @@ module.exports = function(environment) {
       ApiUrl: '//pool.einc.io/',
 
       // HTTP mining endpoint
-      HttpHost: 'http://pool.einc.io',
+      HttpHost: 'https://pool.einc.io',
       HttpPort: 8888,
 
       // Stratum mining endpoint
