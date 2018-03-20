@@ -29,9 +29,9 @@ type UnlockerConfig struct {
 }
 
 const minDepth = 16
-const byzantiumHardForkHeight = 4370000
+const byzantiumHardForkHeight = 0
 
-var homesteadReward = math.MustParseBig256("5000000000000000000")
+var homesteadReward = math.MustParseBig256("3000000000000000000")
 var byzantiumReward = math.MustParseBig256("3000000000000000000")
 
 // Donate 10% from pool fees to developers
@@ -222,9 +222,8 @@ func (u *BlockUnlocker) handleBlock(block *rpc.GetBlockReply, candidate *storage
 		reward.Add(reward, extraTxReward)
 	}
 
-	// Add reward for including uncles
-	uncleReward := getRewardForUncle(candidate.Height)
-	rewardForUncles := big.NewInt(0).Mul(uncleReward, big.NewInt(int64(len(block.Uncles))))
+	// Add 0 reward for uncles
+	rewardForUncles := big.NewInt(0)
 	reward.Add(reward, rewardForUncles)
 
 	candidate.Orphan = false
@@ -238,7 +237,7 @@ func handleUncle(height int64, uncle *rpc.GetBlockReply, candidate *storage.Bloc
 	if err != nil {
 		return err
 	}
-	reward := getUncleReward(uncleHeight, height)
+	reward := big.NewInt(0)
 	candidate.Height = height
 	candidate.UncleHeight = uncleHeight
 	candidate.Orphan = false
@@ -511,14 +510,6 @@ func getConstReward(height int64) *big.Int {
 func getRewardForUncle(height int64) *big.Int {
 	reward := getConstReward(height)
 	return new(big.Int).Div(reward, new(big.Int).SetInt64(32))
-}
-
-func getUncleReward(uHeight, height int64) *big.Int {
-	reward := getConstReward(height)
-	k := height - uHeight
-	reward.Mul(big.NewInt(8-k), reward)
-	reward.Div(reward, big.NewInt(8))
-	return reward
 }
 
 func (u *BlockUnlocker) getExtraRewardForTx(block *rpc.GetBlockReply) (*big.Int, error) {
